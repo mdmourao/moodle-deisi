@@ -1,4 +1,4 @@
-# Moodle image for DEISI with Node.js and jsdom installed.
+# Moodle image for DEISI with CodeRunner, Node.js and jsdom installed.
 # Base: https://github.com/erseco/alpine-moodle
 ARG MOODLE_TAG=v5.2.3
 ARG NODE_VERSION=22
@@ -24,4 +24,20 @@ RUN ln -s ../lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
     && npm cache clean --force \
     && node -e "require('jsdom'); console.log('jsdom OK, node ' + process.version)"
 
+COPY --chown=nobody rootfs/ /
+
 USER nobody
+
+# CodeRunner question type and its behaviour, baked into both the immutable source
+# tree and the runtime tree. Student code runs on the Jobe server (see jobe/).
+ARG CODERUNNER_VERSION=v5.10.6
+ARG CODERUNNER_BEHAVIOUR_VERSION=v1.4.8
+RUN set -e; \
+    for root in /usr/src/moodle /var/www/html; do \
+      base="$root"; [ -d "$root/public" ] && base="$root/public"; \
+      mkdir -p "$base/question/type/coderunner" "$base/question/behaviour/adaptive_adapted_for_coderunner"; \
+      curl -fsSL --retry 5 "https://github.com/trampgeek/moodle-qtype_coderunner/archive/refs/tags/${CODERUNNER_VERSION}.tar.gz" \
+        | tar xz --strip-components=1 -C "$base/question/type/coderunner"; \
+      curl -fsSL --retry 5 "https://github.com/trampgeek/moodle-qbehaviour_adaptive_adapted_for_coderunner/archive/refs/tags/${CODERUNNER_BEHAVIOUR_VERSION}.tar.gz" \
+        | tar xz --strip-components=1 -C "$base/question/behaviour/adaptive_adapted_for_coderunner"; \
+    done

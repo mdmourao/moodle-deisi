@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Builds the image from this repo and starts Moodle on the Codespace's public URL.
+# Pulls the published images (or builds them if they are not published yet) and starts Moodle on the Codespace's public URL.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -8,5 +8,6 @@ if [ -n "${CODESPACE_NAME:-}" ]; then
   export SSLPROXY=true
 fi
 
-docker compose up -d --build
+docker compose pull --quiet || true
+docker compose up -d
 echo "Moodle: ${SITE_URL:-http://localhost} (first start takes a few minutes: docker compose logs -f moodle)"

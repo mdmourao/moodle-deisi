@@ -15,6 +15,7 @@ services:
     restart: unless-stopped
     depends_on:
       - postgres
+      - jobe
     ports:
       - "80:8080"
     environment:
@@ -27,9 +28,17 @@ services:
       DB_PASS: moodle
       MOODLE_USERNAME: admin
       MOODLE_PASSWORD: PLEASE_CHANGEME
+      JOBE_HOST: jobe
     volumes:
       - moodledata:/var/www/moodledata
       - moodlehtml:/var/www/html
+
+  # Runs CodeRunner code (Node.js + jsdom). Not exposed outside the compose network.
+  jobe:
+    image: ghcr.io/mdmourao/moodle-deisi-jobe:latest
+    build: jobe
+    platform: linux/amd64
+    restart: unless-stopped
 
 volumes:
   postgres:

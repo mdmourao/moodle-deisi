@@ -1,4 +1,4 @@
-name: Build and publish image
+name: Build and publish images
 
 on:
   push:
@@ -7,16 +7,23 @@ on:
   pull_request:
   workflow_dispatch:
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
-
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: moodle-deisi
+            context: .
+            platforms: linux/amd64,linux/arm64
+          # jobeinabox is only published for amd64
+          - image: moodle-deisi-jobe
+            context: jobe
+            platforms: linux/amd64
     steps:
       - uses: actions/checkout@v4
 
@@ -27,25 +34,52 @@ jobs:
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
-          registry: ${{ env.REGISTRY }}
+          registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
             type=ref,event=tag
             type=sha
 
+      # Build for the runner first so the image can be tested before it is published.
+      - name: Build for testing
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          load: true
+          tags: ${{ matrix.image }}:test
+          cache-from: type=gha,scope=${{ matrix.image }}
+
+      - name: Test jsdom in Jobe
+        if: matrix.image == 'moodle-deisi-jobe'
+        run: |
+          docker run -d --name jobe -p 4000:80 ${{ matrix.image }}:test
+          for i in $(seq 1 30); do curl -sf http://localhost:4000/jobe/index.php/restapi/languages && break; sleep 2; done
+          echo
+          code="const {JSDOM} = require('jsdom'); const dom = new JSDOM('<p id=x>ola jsdom</p>'); console.log(dom.window.document.getElementById('x').textContent);"
+          body=$(jq -n --arg code "$code" '{run_spec: {language_id: "nodejs", sourcefilename: "test.js", sourcecode: $code, parameters: {memorylimit: 1000}}}')
+          result=$(curl -sf -H 'Content-Type: application/json' -d "$body" http://localhost:4000/jobe/index.php/restapi/runs)
+          echo "$result" | jq .
+          echo "$result" | jq -e '.outcome == 15 and (.stdout | contains("ola jsdom"))'
+
+      - name: Test jsdom in Moodle image
+        if: matrix.image == 'moodle-deisi'
+        run: |
+          docker run --rm --entrypoint node ${{ matrix.image }}:test -e "const {JSDOM}=require('jsdom'); console.log(new JSDOM('<p>ok</p>').window.document.querySelector('p').textContent)"
+          docker run --rm --entrypoint sh ${{ matrix.image }}:test -c 'test -f /var/www/html/public/question/type/coderunner/version.php && test -f /var/www/html/public/question/behaviour/adaptive_adapted_for_coderunner/version.php && echo "CodeRunner OK"'
+
       - uses: docker/build-push-action@v6
         with:
-          context: .
-          platforms: linux/amd64,linux/arm64
+          context: ${{ matrix.context }}
+          platforms: ${{ matrix.platforms }}
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=${{ matrix.image }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.image }}
