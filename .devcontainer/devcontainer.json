@@ -1,0 +1,13 @@
+{
+  "name": "moodle-deisi",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "hostRequirements": { "cpus": 4 },
+  "forwardPorts": [80],
+  "portsAttributes": {
+    "80": { "label": "Moodle", "onAutoForward": "openBrowser" }
+  },
+  "postStartCommand": "bash .devcontainer/start.sh"
+}

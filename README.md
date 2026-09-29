@@ -27,3 +27,7 @@ Moodle is then at http://localhost. Change `MOODLE_PASSWORD` in `docker-compose.
 - `latest`: latest build of `main`
 - `vX.Y.Z`: pushing a git tag `vX.Y.Z` publishes it
 - `sha-<commit>`: every build
+
+## Codespaces
+
+Open the repo in a Codespace (Code → Codespaces → Create codespace on main). It builds the image, starts Moodle and Postgres, and forwards port 80; open the "Moodle" port from the Ports tab. The first start takes a few minutes.
