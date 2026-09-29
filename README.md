@@ -1,5 +1,8 @@
 # moodle-deisi
 
+> [!WARNING]
+> Everything in this repository (Dockerfiles, workflow, compose files, scripts and the example question) was written by [Claude](https://claude.ai/code), an AI assistant, and has **not been reviewed or validated by the repository owner**. Review it before using it in production.
+
 Moodle for DEISI with [CodeRunner](https://coderunner.org.nz) questions that can use [jsdom](https://github.com/jsdom/jsdom) in Node.js.
 
 Two images are built by GitHub Actions and published to the GitHub Container Registry:
