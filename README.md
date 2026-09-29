@@ -17,7 +17,7 @@ CodeRunner does not run code inside Moodle: it sends it to the Jobe server. That
 docker compose up -d
 ```
 
-Moodle is then at http://localhost (first start takes a few minutes). Log in with `admin` / `PLEASE_CHANGEME` (change it in `docker-compose.yml`). CodeRunner is configured automatically to use the `jobe` container.
+Moodle is then at http://localhost (first start takes a few minutes). Log in with `admin` / `admin` (test only: change `MOODLE_PASSWORD` in `docker-compose.yml` for anything public). CodeRunner is configured automatically to use the `jobe` container.
 
 ## Codespaces
 

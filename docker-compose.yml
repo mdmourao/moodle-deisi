@@ -27,7 +27,7 @@ services:
       DB_USER: moodle
       DB_PASS: moodle
       MOODLE_USERNAME: admin
-      MOODLE_PASSWORD: PLEASE_CHANGEME
+      MOODLE_PASSWORD: admin
       JOBE_HOST: jobe
     volumes:
       - moodledata:/var/www/moodledata
