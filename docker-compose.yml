@@ -11,7 +11,7 @@ services:
 
   moodle:
     image: ghcr.io/mdmourao/moodle-deisi:latest
-    build: .
+    pull_policy: always
     restart: unless-stopped
     depends_on:
       - postgres
@@ -37,7 +37,7 @@ services:
   # Runs CodeRunner code (Node.js + jsdom). Not exposed outside the compose network.
   jobe:
     image: ghcr.io/mdmourao/moodle-deisi-jobe:latest
-    build: jobe
+    pull_policy: always
     platform: linux/amd64
     restart: unless-stopped
 

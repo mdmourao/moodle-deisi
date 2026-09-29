@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Pulls the published images (or builds them if they are not published yet) and starts Moodle on the Codespace's public URL.
+# Pulls the latest published images from GHCR and starts Moodle on the Codespace's public URL.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -11,6 +11,6 @@ if [ -n "${CODESPACE_NAME:-}" ]; then
   export REVERSEPROXY=true
 fi
 
-docker compose pull --quiet || true
+docker compose pull --quiet
 docker compose up -d
 echo "Moodle: ${SITE_URL:-http://localhost} (first start takes a few minutes: docker compose logs -f moodle)"
