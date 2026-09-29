@@ -21,6 +21,7 @@ services:
     environment:
       SITE_URL: ${SITE_URL:-http://localhost}
       SSLPROXY: ${SSLPROXY:-false}
+      REVERSEPROXY: ${REVERSEPROXY:-false}
       DB_TYPE: pgsql
       DB_HOST: postgres
       DB_NAME: moodle
