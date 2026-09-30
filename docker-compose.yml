@@ -19,9 +19,9 @@ services:
     ports:
       - "80:8080"
     environment:
-      SITE_URL: ${SITE_URL:-http://localhost}
-      SSLPROXY: ${SSLPROXY:-false}
-      REVERSEPROXY: ${REVERSEPROXY:-false}
+      SITE_URL: "${SITE_URL:-${CODESPACE_NAME:+https://}${CODESPACE_NAME:-http://localhost}${CODESPACE_NAME:+-80.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}}}"
+      SSLPROXY: "${SSLPROXY:-${CODESPACE_NAME:+true}}"
+      REVERSEPROXY: "${REVERSEPROXY:-${CODESPACE_NAME:+true}}"
       DB_TYPE: pgsql
       DB_HOST: postgres
       DB_NAME: moodle

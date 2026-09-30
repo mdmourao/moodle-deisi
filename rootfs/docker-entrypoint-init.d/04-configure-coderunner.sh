@@ -11,6 +11,9 @@ CFG="php -d max_input_vars=10000 /var/www/html/admin/cli/cfg.php"
 
 $CFG --component=qtype_coderunner --name=jobe_host --set="$JOBE_HOST"
 $CFG --component=qtype_coderunner --name=jobe_apikey --set="${JOBE_API_KEY:-}"
+# Not set by default on fresh installs, which makes CodeRunner fail with
+# "No sandboxes available for running code!".
+$CFG --component=qtype_coderunner --name=jobesandbox_enabled --set=1
 
 # Moodle blocks HTTP requests to private networks by default, which is where the
 # Jobe container lives. Keep the other default blocks (localhost, cloud metadata).
