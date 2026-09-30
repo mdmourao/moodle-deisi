@@ -50,8 +50,8 @@ function titulo(html) {
     <acelang></acelang>
     <sandbox></sandbox>
     <grader></grader>
-    <cputimelimitsecs></cputimelimitsecs>
-    <memlimitmb></memlimitmb>
+    <cputimelimitsecs>15</cputimelimitsecs>
+    <memlimitmb>1000</memlimitmb>
     <sandboxparams></sandboxparams>
     <templateparams></templateparams>
     <hoisttemplateparams>1</hoisttemplateparams>
