@@ -38,6 +38,8 @@ Open the repo in a Codespace (Code → Codespaces → Create codespace on main).
 2. **Import** → format **Moodle XML** → upload [`examples/pergunta-jsdom.xml`](examples/pergunta-jsdom.xml).
 3. Open the question in **Preview**, paste the answer below and click **Check**. Both tests should pass.
 
+**Time limit:** loading jsdom costs about 1–1.5 s of CPU, and CodeRunner's default limit is 3 s per run, which a slower machine can exceed (`Time limit exceeded`). Questions that use jsdom should set **Customisation → Advanced customisation → Sandbox → TimeLimit (secs)** to `10`, as the example question does.
+
 ```js
 const { JSDOM } = require('jsdom');
 

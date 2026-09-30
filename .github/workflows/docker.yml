@@ -72,6 +72,12 @@ jobs:
           result=$(curl -sf -H 'Content-Type: application/json' -d "$body" http://localhost:4000/jobe/index.php/restapi/runs)
           echo "$result" | jq .
           echo "$result" | jq -e '.outcome == 15 and (.stdout | contains("ola jsdom"))'
+          # Same limits CodeRunner sends by default for nodejs questions, timed.
+          body=$(jq -n --arg code "$code" '{run_spec: {language_id: "nodejs", sourcefilename: "test.js", sourcecode: $code, parameters: {cputime: 3, memorylimit: 1000, numprocs: 20}}}')
+          start=$(date +%s.%N)
+          result=$(curl -sf -H 'Content-Type: application/json' -d "$body" http://localhost:4000/jobe/index.php/restapi/runs)
+          echo "CodeRunner defaults: $(echo "$result" | jq -c '{outcome, stdout, stderr}') in $(echo "$(date +%s.%N) - $start" | bc) s"
+          echo "$result" | jq -e '.outcome == 15' >/dev/null || echo "::warning::jsdom run does not fit CodeRunner's default 3 s limit; raise TimeLimit on jsdom questions"
 
       - name: Test jsdom in Moodle image
         if: matrix.image == 'moodle-deisi'

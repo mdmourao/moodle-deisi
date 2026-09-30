@@ -31,3 +31,7 @@ RUN rm -f /usr/bin/node /usr/bin/nodejs \
     && rm -rf /usr/local/lib/node \
     && ln -s /opt/node-libs/node_modules /usr/local/lib/node \
     && cd /tmp && env -i /usr/bin/nodejs -e "require('jsdom'); console.log('jsdom OK, node ' + process.version)"
+
+# Loading jsdom reads hundreds of files; on a cold disk the first CodeRunner run can
+# exceed its time limit. Warm the page cache once before Apache starts.
+CMD ["/bin/sh", "-c", "cd /tmp && /usr/bin/nodejs -e \"require('jsdom')\" >/dev/null 2>&1; exec /usr/sbin/apache2ctl -D FOREGROUND"]
